@@ -1,4 +1,4 @@
-// swift-tools-version:5.4
+// swift-tools-version:5.3.2
 
 import PackageDescription
 
@@ -21,5 +21,5 @@ let package = Package(
             name: "TelegramBotSDK",
             dependencies: ["CCurl"]),
     ],
-    swiftLanguageVersions: [.version("5.4")]
+    swiftLanguageVersions: [.version("5.3.2")]
 )
