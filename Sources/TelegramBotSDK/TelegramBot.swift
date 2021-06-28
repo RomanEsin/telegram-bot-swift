@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 import Dispatch
@@ -160,12 +154,11 @@ public class TelegramBot {
         var hasAttachments = false
         for valueOrNil in parameters.values {
             guard let value = valueOrNil else { continue }
-            
+            guard value as? [LabeledPrice] == nil else { continue }
             if value is InputFile {
                 hasAttachments = true
                 break
             }
-            
             if let inputFileOrString = value as? InputFileOrString {
                 if case .inputFile = inputFileOrString {
                     hasAttachments = true
@@ -198,10 +191,10 @@ public class TelegramBot {
         // -1 for '\0'
         let byteCount = requestData.count - 1
         
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
             requestData.withUnsafeBytes { (unsafeRawBufferPointer) -> Void in
                 let unsafeBufferPointer = unsafeRawBufferPointer.bindMemory(to: UInt8.self).baseAddress!
-                self.curlPerformRequest(endpointUrl: endpointUrl, contentType: contentType, resultType: resultType, requestBytes: unsafeBufferPointer, byteCount: byteCount, completion: completion)
+                self?.curlPerformRequest(endpointUrl: endpointUrl, contentType: contentType, resultType: resultType, requestBytes: unsafeBufferPointer, byteCount: byteCount, completion: completion)
             }
         }
     }
@@ -214,10 +207,12 @@ public class TelegramBot {
             completion(nil, .libcurlInitError)
             return
         }
-        defer { curl_easy_cleanup(curl) }
+        defer {
+            curl_easy_cleanup(curl)
+        }
         
         curl_easy_setopt_string(curl, CURLOPT_URL, endpointUrl.absoluteString)
-        //curl_easy_setopt_int(curl, CURLOPT_SAFE_UPLOAD, 1)
+        curl_easy_setopt_int(curl, CURLOPT_HTTP_VERSION, Int32(CURL_HTTP_VERSION_1_1))
         curl_easy_setopt_int(curl, CURLOPT_POST, 1)
         curl_easy_setopt_binary(curl, CURLOPT_POSTFIELDS, requestBytes)
         curl_easy_setopt_int(curl, CURLOPT_POSTFIELDSIZE, Int32(byteCount))
@@ -263,33 +258,37 @@ public class TelegramBot {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dateDecodingStrategy = .secondsSince1970
-        guard let telegramResponse = try? decoder.decode(Response<T>.self, from: data) else {
+        var telegramResponse: Response<T>?
+        do {
+            telegramResponse = try decoder.decode(Response<T>.self, from: data)
+        } catch {
+            print(error.localizedDescription)
             completion(nil, .decodeError(data: data))
             return
         }
-        
+        guard let safeTelegramResponse = telegramResponse else {
+            completion(nil, .decodeError(data: data))
+            return
+        }
         guard httpCode == 200 else {
             completion(nil,
                        .invalidStatusCode(
                         statusCode: httpCode,
-                        telegramDescription: telegramResponse.description!,
-                        telegramErrorCode: telegramResponse.errorCode!,
+                        telegramDescription: safeTelegramResponse.description!,
+                        telegramErrorCode: safeTelegramResponse.errorCode!,
                         data: data)
             )
             return
         }
-        
         guard !data.isEmpty else {
             completion(nil, .noDataReceived)
             return
         }
-        
-        if !telegramResponse.ok {
+        if !safeTelegramResponse.ok {
             completion(nil, .serverError(data: data))
             return
         }
-        
-        completion(telegramResponse.result!, nil)
+        completion(safeTelegramResponse.result!, nil)
     }
     
     private func reportCurlError(code: CURLcode, completion: @escaping DataTaskCompletion) {

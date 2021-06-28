@@ -29,7 +29,6 @@ public class Update: Codable {
         self.poll = poll
         self.pollAnswer = pollAnswer
     }
-
 }
 
 
@@ -50,7 +49,6 @@ public class WebhookInfo: Codable {
         self.maxConnections = maxConnections
         self.allowedUpdates = allowedUpdates
     }
-
 }
 
 
@@ -75,7 +73,6 @@ public class User: Codable {
         self.canReadAllGroupMessages = canReadAllGroupMessages
         self.supportsInlineQueries = supportsInlineQueries
     }
-
 }
 
 
@@ -110,7 +107,6 @@ public class Chat: Codable {
         self.stickerSetName = stickerSetName
         self.canSetStickerSet = canSetStickerSet
     }
-
 }
 
 
@@ -211,7 +207,6 @@ public class Message: Codable {
         self.connectedWebsite = connectedWebsite
         self.replyMarkup = replyMarkup
     }
-
 }
 
 
@@ -230,7 +225,6 @@ public class MessageEntity: Codable {
         self.user = user
         self.language = language
     }
-
 }
 
 
@@ -247,7 +241,6 @@ public class PhotoSize: Codable {
         self.height = height
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -270,7 +263,6 @@ public class Audio: Codable {
         self.fileSize = fileSize
         self.thumb = thumb
     }
-
 }
 
 
@@ -289,7 +281,6 @@ public class Document: Codable {
         self.mimeType = mimeType
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -312,7 +303,6 @@ public class Video: Codable {
         self.mimeType = mimeType
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -337,7 +327,6 @@ public class Animation: Codable {
         self.mimeType = mimeType
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -354,7 +343,6 @@ public class Voice: Codable {
         self.mimeType = mimeType
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -373,7 +361,6 @@ public class VideoNote: Codable {
         self.thumb = thumb
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -390,7 +377,6 @@ public class Contact: Codable {
         self.userId = userId
         self.vcard = vcard
     }
-
 }
 
 
@@ -401,7 +387,6 @@ public class Dice: Codable {
         self.emoji = emoji
         self.value = value
     }
-
 }
 
 
@@ -412,7 +397,6 @@ public class Location: Codable {
         self.longitude = longitude
         self.latitude = latitude
     }
-
 }
 
 
@@ -429,7 +413,6 @@ public class Venue: Codable {
         self.foursquareId = foursquareId
         self.foursquareType = foursquareType
     }
-
 }
 
 
@@ -440,7 +423,6 @@ public class PollOption: Codable {
         self.text = text
         self.voterCount = voterCount
     }
-
 }
 
 
@@ -453,7 +435,6 @@ public class PollAnswer: Codable {
         self.user = user
         self.optionIds = optionIds
     }
-
 }
 
 
@@ -467,11 +448,11 @@ public class Poll: Codable {
     public var type: PollType
     public var allowsMultipleAnswers: Bool
     public var correctOptionId: Int?
-    public var explanation: String
+    public var explanation: String?
     public var explanationEntities: [MessageEntity]? = []
     public var openPeriod: Int?
     public var closeDate: Date?
-    public init(id: String, question: String, options: [PollOption], totalVoterCount: Int, isClosed: Bool, isAnonymous: Bool, type: PollType, allowsMultipleAnswers: Bool, correctOptionId: Int? = nil, explanation: String, explanationEntities: [MessageEntity]? = nil, openPeriod: Int? = nil, closeDate: Date? = nil) {
+    public init(id: String, question: String, options: [PollOption], totalVoterCount: Int, isClosed: Bool, isAnonymous: Bool, type: PollType, allowsMultipleAnswers: Bool, correctOptionId: Int? = nil, explanation: String? = nil, explanationEntities: [MessageEntity]? = nil, openPeriod: Int? = nil, closeDate: Date? = nil) {
         self.id = id
         self.question = question
         self.options = options
@@ -486,7 +467,6 @@ public class Poll: Codable {
         self.openPeriod = openPeriod
         self.closeDate = closeDate
     }
-
 }
 
 
@@ -497,7 +477,6 @@ public class UserProfilePhotos: Codable {
         self.totalCount = totalCount
         self.photos = photos
     }
-
 }
 
 
@@ -512,7 +491,6 @@ public class File: Codable {
         self.fileSize = fileSize
         self.filePath = filePath
     }
-
 }
 
 
@@ -527,7 +505,6 @@ public class ReplyKeyboardMarkup: Codable {
         self.oneTimeKeyboard = oneTimeKeyboard
         self.selective = selective
     }
-
 }
 
 
@@ -542,7 +519,6 @@ public class KeyboardButton: Codable {
         self.requestLocation = requestLocation
         self.requestPoll = requestPoll
     }
-
 }
 
 
@@ -551,7 +527,6 @@ public class KeyboardButtonPollType: Codable {
     public init(type: PollType? = nil) {
         self.type = type
     }
-
 }
 
 
@@ -562,7 +537,6 @@ public class ReplyKeyboardRemove: Codable {
         self.removeKeyboard = removeKeyboard
         self.selective = selective
     }
-
 }
 
 
@@ -571,7 +545,6 @@ public class InlineKeyboardMarkup: Codable {
     public init(inlineKeyboard: [[InlineKeyboardButton]]) {
         self.inlineKeyboard = inlineKeyboard
     }
-
 }
 
 
@@ -594,14 +567,11 @@ public class InlineKeyboardButton: Codable {
         self.callbackGame = callbackGame
         self.pay = pay
     }
-
 }
 
 
 public class LoginUrl: Codable {
-    public init() {
-    }
-
+    public init() { }
 }
 
 
@@ -622,7 +592,6 @@ public class CallbackQuery: Codable {
         self.data = data
         self.gameShortName = gameShortName
     }
-
 }
 
 
@@ -633,7 +602,6 @@ public class ForceReply: Codable {
         self.forceReply = forceReply
         self.selective = selective
     }
-
 }
 
 
@@ -648,7 +616,6 @@ public class ChatPhoto: Codable {
         self.bigFileId = bigFileId
         self.bigFileUniqueId = bigFileUniqueId
     }
-
 }
 
 
@@ -693,7 +660,6 @@ public class ChatMember: Codable {
         self.canSendOtherMessages = canSendOtherMessages
         self.canAddWebPagePreviews = canAddWebPagePreviews
     }
-
 }
 
 
@@ -716,7 +682,6 @@ public class ChatPermissions: Codable {
         self.canInviteUsers = canInviteUsers
         self.canPinMessages = canPinMessages
     }
-
 }
 
 
@@ -727,7 +692,6 @@ public class BotCommand: Codable {
         self.command = command
         self.description = description
     }
-
 }
 
 
@@ -738,7 +702,6 @@ public class ResponseParameters: Codable {
         self.migrateToChatId = migrateToChatId
         self.retryAfter = retryAfter
     }
-
 }
 
 
@@ -753,7 +716,6 @@ public class InputMediaPhoto: Codable {
         self.caption = caption
         self.parseMode = parseMode
     }
-
 }
 
 
@@ -778,7 +740,6 @@ public class InputMediaVideo: Codable {
         self.duration = duration
         self.supportsStreaming = supportsStreaming
     }
-
 }
 
 
@@ -801,7 +762,6 @@ public class InputMediaAnimation: Codable {
         self.height = height
         self.duration = duration
     }
-
 }
 
 
@@ -824,7 +784,6 @@ public class InputMediaAudio: Codable {
         self.performer = performer
         self.title = title
     }
-
 }
 
 
@@ -841,7 +800,6 @@ public class InputMediaDocument: Codable {
         self.caption = caption
         self.parseMode = parseMode
     }
-
 }
 
 
@@ -868,7 +826,6 @@ public class Sticker: Codable {
         self.maskPosition = maskPosition
         self.fileSize = fileSize
     }
-
 }
 
 
@@ -887,7 +844,6 @@ public class StickerSet: Codable {
         self.stickers = stickers
         self.thumb = thumb
     }
-
 }
 
 
@@ -902,7 +858,6 @@ public class MaskPosition: Codable {
         self.yShift = yShift
         self.scale = scale
     }
-
 }
 
 
@@ -919,7 +874,6 @@ public class InlineQuery: Codable {
         self.query = query
         self.offset = offset
     }
-
 }
 
 
@@ -948,7 +902,6 @@ public class InlineQueryResultArticle: Codable {
         self.thumbWidth = thumbWidth
         self.thumbHeight = thumbHeight
     }
-
 }
 
 
@@ -979,7 +932,6 @@ public class InlineQueryResultPhoto: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1010,7 +962,6 @@ public class InlineQueryResultGif: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1039,7 +990,6 @@ public class InlineQueryResultLocation: Codable {
         self.thumbWidth = thumbWidth
         self.thumbHeight = thumbHeight
     }
-
 }
 
 
@@ -1070,7 +1020,6 @@ public class InlineQueryResultMpeg4Gif: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1105,7 +1054,6 @@ public class InlineQueryResultVideo: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1132,7 +1080,6 @@ public class InlineQueryResultAudio: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1157,7 +1104,6 @@ public class InlineQueryResultVoice: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1190,7 +1136,6 @@ public class InlineQueryResultDocument: Codable {
         self.thumbWidth = thumbWidth
         self.thumbHeight = thumbHeight
     }
-
 }
 
 
@@ -1223,7 +1168,6 @@ public class InlineQueryResultVenue: Codable {
         self.thumbWidth = thumbWidth
         self.thumbHeight = thumbHeight
     }
-
 }
 
 
@@ -1252,7 +1196,6 @@ public class InlineQueryResultContact: Codable {
         self.thumbWidth = thumbWidth
         self.thumbHeight = thumbHeight
     }
-
 }
 
 
@@ -1267,7 +1210,6 @@ public class InlineQueryResultGame: Codable {
         self.gameShortName = gameShortName
         self.replyMarkup = replyMarkup
     }
-
 }
 
 
@@ -1292,7 +1234,6 @@ public class InlineQueryResultCachedPhoto: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1315,7 +1256,6 @@ public class InlineQueryResultCachedGif: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1338,7 +1278,6 @@ public class InlineQueryResultCachedMpeg4Gif: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1355,7 +1294,6 @@ public class InlineQueryResultCachedSticker: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1380,7 +1318,6 @@ public class InlineQueryResultCachedDocument: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1405,7 +1342,6 @@ public class InlineQueryResultCachedVideo: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1428,7 +1364,6 @@ public class InlineQueryResultCachedVoice: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1449,7 +1384,6 @@ public class InlineQueryResultCachedAudio: Codable {
         self.replyMarkup = replyMarkup
         self.inputMessageContent = inputMessageContent
     }
-
 }
 
 
@@ -1462,7 +1396,6 @@ public class InputTextMessageContent: Codable {
         self.parseMode = parseMode
         self.disableWebPagePreview = disableWebPagePreview
     }
-
 }
 
 
@@ -1475,7 +1408,6 @@ public class InputLocationMessageContent: Codable {
         self.longitude = longitude
         self.livePeriod = livePeriod
     }
-
 }
 
 
@@ -1494,7 +1426,6 @@ public class InputVenueMessageContent: Codable {
         self.foursquareId = foursquareId
         self.foursquareType = foursquareType
     }
-
 }
 
 
@@ -1509,7 +1440,6 @@ public class InputContactMessageContent: Codable {
         self.lastName = lastName
         self.vcard = vcard
     }
-
 }
 
 
@@ -1526,7 +1456,6 @@ public class ChosenInlineResult: Codable {
         self.inlineMessageId = inlineMessageId
         self.query = query
     }
-
 }
 
 
@@ -1537,7 +1466,6 @@ public class LabeledPrice: Codable {
         self.label = label
         self.amount = amount
     }
-
 }
 
 
@@ -1554,7 +1482,6 @@ public class Invoice: Codable {
         self.currency = currency
         self.totalAmount = totalAmount
     }
-
 }
 
 
@@ -1573,7 +1500,6 @@ public class ShippingAddress: Codable {
         self.streetLine2 = streetLine2
         self.postCode = postCode
     }
-
 }
 
 
@@ -1588,20 +1514,18 @@ public class OrderInfo: Codable {
         self.email = email
         self.shippingAddress = shippingAddress
     }
-
 }
 
 
 public class ShippingOption: Codable {
     public var id: String
     public var title: String
-    public var prices: [LabeledPrice] = []
+    public var prices: [LabeledPrice]
     public init(id: String, title: String, prices: [LabeledPrice]) {
         self.id = id
         self.title = title
         self.prices = prices
     }
-
 }
 
 
@@ -1622,7 +1546,6 @@ public class SuccessfulPayment: Codable {
         self.telegramPaymentChargeId = telegramPaymentChargeId
         self.providerPaymentChargeId = providerPaymentChargeId
     }
-
 }
 
 
@@ -1637,18 +1560,17 @@ public class ShippingQuery: Codable {
         self.invoicePayload = invoicePayload
         self.shippingAddress = shippingAddress
     }
-
 }
 
 
 public class PreCheckoutQuery: Codable {
     public var id: String
     public var from: User
-    public var currency: Int
+    public var currency: String
     public var invoicePayload: String
     public var shippingOptionId: String?
     public var orderInfo: OrderInfo?
-    public init(id: String, from: User, currency: Int, invoicePayload: String, shippingOptionId: String? = nil, orderInfo: OrderInfo? = nil) {
+    public init(id: String, from: User, currency: String, invoicePayload: String, shippingOptionId: String? = nil, orderInfo: OrderInfo? = nil) {
         self.id = id
         self.from = from
         self.currency = currency
@@ -1656,7 +1578,6 @@ public class PreCheckoutQuery: Codable {
         self.shippingOptionId = shippingOptionId
         self.orderInfo = orderInfo
     }
-
 }
 
 
@@ -1675,14 +1596,11 @@ public class Game: Codable {
         self.textEntities = textEntities
         self.animation = animation
     }
-
 }
 
 
 public class CallbackGame: Codable {
-    public init() {
-    }
-
+    public init() { }
 }
 
 
@@ -1695,7 +1613,4 @@ public class GameHighScore: Codable {
         self.user = user
         self.score = score
     }
-
 }
-
-

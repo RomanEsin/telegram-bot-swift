@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 
@@ -32,7 +26,7 @@ extension String {
             return self
         }
 
-        let usernameSeparatorIndex = scanner.scanLocation
+        let usernameSeparatorLocation = scanner.currentIndex
 
         let usernameSeparator = "@"
         guard scanner.skipString(usernameSeparator) else {
@@ -54,8 +48,8 @@ extension String {
             return nil
         }
         
-        let t = NSString(string: self)
-		return t.substring(to: usernameSeparatorIndex) +
-			t.substring(from: scanner.scanLocation)
+        let range = usernameSeparatorLocation...scanner.currentIndex
+        let substring = String(self[range])
+        return substring
     }
 }

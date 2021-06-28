@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 import CCurl
@@ -29,10 +23,7 @@ extension TelegramBot {
                 updates = getUpdatesSync(offset: nextOffset, limit: defaultUpdatesLimit, timeout: defaultUpdatesTimeout)
                 if updates == nil {
                     // Retry on temporary problems
-                    if autoReconnect,
-                        let error = lastError,
-                        case .libcurlError(let code, _) = error
-                    {
+                    if autoReconnect, let error = lastError, case .libcurlError(let code, _) = error {
                         switch code {
                         case CURLE_COULDNT_RESOLVE_PROXY, CURLE_COULDNT_RESOLVE_HOST, CURLE_COULDNT_CONNECT, CURLE_OPERATION_TIMEDOUT, CURLE_SSL_CONNECT_ERROR, CURLE_SEND_ERROR, CURLE_RECV_ERROR:
                             let delay = reconnectDelay(retryCount)
@@ -70,4 +61,91 @@ extension TelegramBot {
 		unprocessedUpdates.remove(at: 0)
         return update
     }
+    
+//    static public func nextEverywhereUpdateSyncWorking(bots: [TelegramBot]) -> Update? {
+//        var bots = bots
+//        let emptyBots = bots.filter({$0.unprocessedUpdates.isEmpty})
+//        var allUnprocessedUpdates = bots.flatMap({$0.unprocessedUpdates})
+//        if emptyBots.count == bots.count {
+//            var updates: [Update]?
+//            while true {
+//                for (index, emptyBot) in emptyBots.enumerated() {
+//                    print(index)
+//                    let offset = emptyBot.nextOffset
+//                    let limit = emptyBot.defaultUpdatesLimit
+//                    let botUpdates = emptyBot.getUpdatesSync(offset: offset, limit: limit)
+//                    if let safeUpdates = botUpdates, safeUpdates.count > 0 {
+//                        if let tmp = updates, tmp.count > 0 {
+//                            updates?.append(contentsOf: safeUpdates)
+//                        } else {
+//                            updates = safeUpdates
+//                        }
+//                        let presentUpdates = emptyBot.unprocessedUpdates
+//                        updates?.forEach({ update in
+//                            if !presentUpdates.contains(where: {$0.updateId == update.updateId}) {
+//                                emptyBot.unprocessedUpdates.append(update)
+//                            }
+//                        })
+//                        bots = bots.reversed()
+//                    }
+//                }
+//                guard let safeUpdates = updates, !safeUpdates.isEmpty else { continue }
+//                allUnprocessedUpdates.append(contentsOf: safeUpdates)
+//                break
+//            }
+//        }
+//        guard let next = allUnprocessedUpdates.first else { return nil }
+//        guard let bot = bots.first(where: {$0.unprocessedUpdates.contains(where: {$0.updateId == next.updateId})}) else {
+//            print("what")
+//            return nil
+//        }
+//        let nextUpdateId = next.updateId + 1
+//        if bot.nextOffset == nil || nextUpdateId > bot.nextOffset! {
+//            bot.nextOffset = nextUpdateId
+//        }
+//        bot.unprocessedUpdates.remove(at: 0)
+//        return next
+//    }
+//
+//    static public func nextEverywhereUpdateSync(bots: inout [TelegramBot]) -> Update? {
+//        var unprocessedUpdates = bots.flatMap({$0.unprocessedUpdates})
+//        if unprocessedUpdates.isEmpty {
+//            while true {
+//                let emptyBots = bots.filter({$0.unprocessedUpdates.isEmpty})
+//                for bot in emptyBots {
+//                    guard bot.botIsPollingUpdates == false else { continue }
+//                    let offset = bot.nextOffset
+//                    let limits = bot.defaultUpdatesLimit
+//                    let timeout = bot.defaultUpdatesTimeout
+//                    bot.botIsPollingUpdates = true
+//                    bot.getUpdatesAsync(offset: offset, limit: limits, timeout: timeout) { updates, _ in
+//                        if let safeUpdates = updates, safeUpdates.count > 0 {
+//                            bot.unprocessedUpdates.append(contentsOf: safeUpdates)
+//                            if unprocessedUpdates.isEmpty {
+//                                unprocessedUpdates.append(contentsOf: safeUpdates)
+//                                if bot.botIsPollingUpdates == true {
+//                                    bot.botIsPollingUpdates = false
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                if !unprocessedUpdates.isEmpty { break }
+//            }
+//        }
+//        guard let next = unprocessedUpdates.first else { return nil }
+//        guard let bot = bots.first(where: {
+//            $0.unprocessedUpdates.contains(where: {
+//                $0.updateId == next.updateId
+//            })
+//        }) else {
+//            return nil
+//        }
+//        let nextUpdateId = next.updateId + 1
+//        if bot.nextOffset == nil || nextUpdateId > bot.nextOffset! {
+//            bot.nextOffset = nextUpdateId
+//        }
+//        bot.unprocessedUpdates.remove(at: 0)
+//        return next
+//    }
 }

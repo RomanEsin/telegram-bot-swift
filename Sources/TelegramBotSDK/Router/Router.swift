@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 
@@ -22,6 +16,7 @@ public class Router {
 	public var bot: TelegramBot
 
 	public lazy var partialMatch: Handler? = { context in
+        guard !(context.update.message?.text?.contains("/start") ?? false) else { return true }
 		context.respondAsync("❗ Part of your input was ignored: \(context.args.scanRestOfString())")
 		return true
 	}
@@ -77,13 +72,13 @@ public class Router {
         let scanner = Scanner(string: string)
         scanner.caseSensitive = caseSensitive
         scanner.charactersToBeSkipped = charactersToBeSkipped
-		let originalScanLocation = scanner.scanLocation
+		let originalScanLocation = scanner.currentIndex
 		
 		for path in paths {
 			var command = ""
             var startsWithSlash = false
             if !match(contentType: path.contentType, update: update, commandScanner: scanner, userCommand: &command, startsWithSlash: &startsWithSlash) {
-				scanner.scanLocation = originalScanLocation
+				scanner.currentIndex = originalScanLocation
 				continue;
 			}
 			
@@ -95,7 +90,7 @@ public class Router {
                 return true
 			}
 
-			scanner.scanLocation = originalScanLocation
+			scanner.currentIndex = originalScanLocation
 		}
 
 		if update.message != nil && !string.isEmpty {
@@ -125,10 +120,10 @@ public class Router {
                 startsWithSlash = result.startsWithSlash
                 return true
             case .commands(let commands):
-                let originalScanLocation = commandScanner.scanLocation
+                let originalScanLocation = commandScanner.currentIndex
                 for command in commands {
                     guard let result = command.fetchFrom(commandScanner, caseSensitive: caseSensitive) else {
-                        commandScanner.scanLocation = originalScanLocation
+                        commandScanner.currentIndex = originalScanLocation
                         continue
                     }
                     userCommand = result.command

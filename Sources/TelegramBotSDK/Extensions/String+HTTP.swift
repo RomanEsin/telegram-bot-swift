@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 
@@ -17,25 +11,11 @@ extension String {
         // "0123456789ABCDEF"
         static let hexDigits: [CChar] = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70]
         
-        static let formUrlencodedAllowedCharacters: CharacterSet = {
-            var cs = CharacterSet()
-            cs.insert(charactersIn:
-                "0123456789" +
-                "abcdefghijklmnopqrstuvwxyz" +
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                "-._* ")
-            return cs
-        }()
+        static let formUrlencodedAllowedCharacters: CharacterSet = CharacterSet(charactersIn:
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._*")
         
-        static let urlQueryAllowedCharacters: CharacterSet = {
-            var cs = CharacterSet()
-			cs.insert(charactersIn:
-                "0123456789" +
-                "abcdefghijklmnopqrstuvwxyz" +
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                "-._~")
-            return cs
-        }()
+        static let urlQueryAllowedCharacters: CharacterSet = CharacterSet(charactersIn:
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._~")
     }
     
     /// Replaces spaces with `'+'`, percent-encodes everything

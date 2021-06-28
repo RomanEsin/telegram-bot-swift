@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 import Dispatch
@@ -21,10 +15,10 @@ extension TelegramBot {
 		var retval: TResult!
 		let sem = DispatchSemaphore(value: 0)
 		let queue = DispatchQueue.global()
-		requestAsync(endpoint, parameters, queue: queue) {
+		requestAsync(endpoint, parameters, queue: queue) { [weak self]
 			(result: TResult?, error: DataTaskError?) in
 			retval = result
-			self.lastError = error
+			self?.lastError = error
 			sem.signal()
 		}
 		RunLoop.current.waitForSemaphore(sem)
@@ -40,7 +34,6 @@ extension TelegramBot {
 	/// Perform asynchronous request.
 	/// - Returns: Decodable  on success. Nil on error, in which case `error` contains the details.
     internal func requestAsync<TResult>(_ endpoint: String, _ parameters: [String: Encodable?] = [:], queue: DispatchQueue = DispatchQueue.main, completion: ((_ result: TResult?, _ error: DataTaskError?) -> ())?) where TResult: Decodable {
-		
         startDataTaskForEndpoint(endpoint, parameters: parameters, resultType: TResult.self) {
 			rawResult, error in
             var resultValid = false
@@ -62,16 +55,16 @@ extension TelegramBot {
 	/// Perform asynchronous request.
 	/// - Returns: array of Decodable  on success. Nil on error, in which case `error` contains the details.
 	internal func requestAsync<TResult>(_ endpoint: String, _ parameters: [String: Encodable?] = [:], queue: DispatchQueue = DispatchQueue.main, completion: ((_ result: [TResult]?, _ error: DataTaskError?) -> ())?) where TResult: Decodable {
-		
         startDataTaskForEndpoint(endpoint, parameters: parameters, resultType: [TResult].self) {
 			rawResult, error in
             var resultValid = false
             if (rawResult as? [TResult]?) != nil {
                 resultValid = true
             }
-			queue.async() {
-                completion?(resultValid ? rawResult as! [TResult]? : nil, error)
-			}
+            completion?(resultValid ? rawResult as! [TResult]? : nil, error)
+			//queue.async() {
+            //    completion?(resultValid ? rawResult as! [TResult]? : nil, error)
+			//}
 		}
 	}
 	

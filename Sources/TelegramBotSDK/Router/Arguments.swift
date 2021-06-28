@@ -3,12 +3,6 @@
 //
 // This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
-// Copyright (c) 2015 - 2020 Andrey Fidrya and the project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See LICENSE.txt for license information
-// See AUTHORS.txt for the list of the project authors
-//
 
 import Foundation
 
@@ -76,7 +70,7 @@ public class Arguments {
 	}
 	
 	public func scanRestOfString() -> String {
-		guard let restOfString = scanner.scanUpTo("") else {
+		guard let restOfString = scanner.scanUpToString("") else {
 			return ""
 		}
 		return restOfString

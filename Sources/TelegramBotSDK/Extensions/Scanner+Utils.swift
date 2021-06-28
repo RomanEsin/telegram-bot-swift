@@ -12,15 +12,6 @@ public extension Scanner {
     func skipInt() -> Bool {
         return scanInt() != nil
     }
-    
-    @discardableResult
-    func skipInt32() -> Bool {
-        #if os(OSX)
-            return scanInt32(nil)
-        #else
-            return scanInt() != nil
-        #endif
-    }
 
     @discardableResult
     func skipInt64() -> Bool {
@@ -40,11 +31,6 @@ public extension Scanner {
     @discardableResult
     func skipDouble() -> Bool {
         return scanDouble() != nil
-    }
-    
-    @discardableResult
-    func skipHexUInt32() -> Bool {
-        return scanHexUInt32() != nil
     }
     
     @discardableResult
@@ -88,7 +74,7 @@ public extension Scanner {
     
     @discardableResult
     func skipUpTo(_ string: String) -> Bool {
-        return scanUpTo(string) != nil
+        return scanUpToString(string) != nil
     }
 
     @discardableResult
@@ -97,8 +83,9 @@ public extension Scanner {
     }
 
     func peekUtf16CodeUnit() -> UTF16.CodeUnit? {
-        let originalScanLocation = scanLocation
-        defer { scanLocation = originalScanLocation }
+        let originalScanLocation = currentIndex
+        let scanLocation = string.distance(from: string.startIndex, to: originalScanLocation)
+        defer { self.currentIndex = originalScanLocation }
         
         let originalCharactersToBeSkipped = charactersToBeSkipped
         defer { charactersToBeSkipped = originalCharactersToBeSkipped }
@@ -115,6 +102,7 @@ public extension Scanner {
     
     var scanLocationInCharacters: Int {
         let utf16 = string.utf16
+        let scanLocation = string.distance(from: string.startIndex, to: currentIndex)
         guard let to16 = utf16.index(utf16.startIndex, offsetBy: scanLocation, limitedBy: utf16.endIndex),
             let to = String.Index(to16, within: string) else {
                 return 0
@@ -124,6 +112,7 @@ public extension Scanner {
     
     private var currentCharacterIndex: String.Index? {
         let utf16 = string.utf16
+        let scanLocation = string.distance(from: string.startIndex, to: currentIndex)
         guard let to16 = utf16.index(utf16.startIndex, offsetBy: scanLocation, limitedBy: utf16.endIndex),
             let to = String.Index(to16, within: string) else {
                 return nil
