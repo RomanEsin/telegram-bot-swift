@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "TelegramBotSDK",
+    platforms: [.macOS(.v10_15)],
     products: [
         .library(
             name: "CCurl",
