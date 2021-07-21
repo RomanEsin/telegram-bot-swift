@@ -1,8 +1,7 @@
 //
-//  File.swift
-//  
+// ResultBuildersExample.swift
 //
-//  Created by Роман Есин on 22.07.2021.
+// This source file is part of the Telegram Bot SDK for Swift (unofficial).
 //
 
 import Foundation
