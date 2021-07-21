@@ -15,6 +15,15 @@ let router = Router(bot: bot) {
         return true
     }
 
+    CommandsHandler {
+        "help"
+        "help2"
+        "help3"
+    } handler: { context in
+        context.respondAsync(context.command)
+        return true
+    }
+
     ContentTypeHandler(contentType: .replyToMessage) { context in
         context.respondSync("Test message")
         return true
