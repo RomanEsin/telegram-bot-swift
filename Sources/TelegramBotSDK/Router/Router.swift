@@ -6,9 +6,10 @@
 
 import Foundation
 
+public typealias Handler = (_ context: Context) throws -> Bool
+public typealias Path = (contentType: ContentType, handler: Handler)
+
 public class Router {
-	public typealias Handler = (_ context: Context) throws -> Bool
-	public typealias Path = (contentType: ContentType, handler: Handler)
 	
     public var caseSensitive = false
     public var charactersToBeSkipped: CharacterSet? = CharacterSet.whitespacesAndNewlines
@@ -52,6 +53,11 @@ public class Router {
     public convenience init(bot: TelegramBot, setup: (_ router: Router)->()) {
         self.init(bot: bot)
         setup(self)
+    }
+
+    public convenience init(bot: TelegramBot, @PathBuilder _ commands: () -> [Path]) {
+        self.init(bot: bot)
+        self.paths = commands()
     }
 	
 	public func add(_ contentType: ContentType, _ handler: @escaping (Context) throws -> Bool) {
