@@ -77,7 +77,7 @@ extension TelegramBotTests {
     static var allTests : [(String, (TelegramBotTests) -> () throws -> Void)] {
         return [
             ("testGetBot", testGetBot),
-            ("testSendMessage", testSendMessage)
+            ("testSendMessage", testSendMessage),
             ("testSendImage", testSendImage)
         ]
     }
