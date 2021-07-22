@@ -7,22 +7,16 @@ let package = Package(
     platforms: [.macOS(.v10_15)],
     products: [
         .library(
-            name: "CCurl",
-            targets: ["CCurl"]),
-        .library(
             name: "TelegramBotSDK",
             targets: ["TelegramBotSDK"]),
     ],
     targets: [
         .target(
-            name: "CCurl",
-            dependencies: []),
-        .target(
             name: "TelegramBotSDK",
-            dependencies: ["CCurl"]),
+            dependencies: []),
         .testTarget(
             name: "TelegramBotSDKTests",
-            dependencies: ["CCurl", "TelegramBotSDK"]
+            dependencies: ["TelegramBotSDK"]
         )
     ],
     swiftLanguageVersions: [.v5]
