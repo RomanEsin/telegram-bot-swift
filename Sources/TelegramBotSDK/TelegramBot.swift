@@ -193,6 +193,7 @@ public class TelegramBot {
             return
         }
 
+        request.httpMethod = "POST"
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         request.httpBody = requestData
 
