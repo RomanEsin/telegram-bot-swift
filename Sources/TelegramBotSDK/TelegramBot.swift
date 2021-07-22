@@ -5,6 +5,9 @@
 //
 
 import Foundation
+#if os(Linux)
+import FoundationNetworking
+#endif
 import Dispatch
 
 public class TelegramBot {
