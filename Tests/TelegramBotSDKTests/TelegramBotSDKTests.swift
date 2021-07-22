@@ -76,7 +76,9 @@ class TelegramBotTests: XCTestCase {
 extension TelegramBotTests {
     static var allTests : [(String, (TelegramBotTests) -> () throws -> Void)] {
         return [
-            ("testCreateBot", testCreateBot),
+            ("testGetBot", testGetBot),
+            ("testSendMessage", testSendMessage)
+            ("testSendImage", testSendImage)
         ]
     }
 }
