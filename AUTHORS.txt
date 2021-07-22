@@ -6,3 +6,4 @@ Project authors
 - Andrea de Marco <24erre@gmail.com>
 - Artur Lich <gitkid@icloud.com>
 - Matteo Piccina <matteo.piccina.98@gmail.com>
+- Maxim Lanskoy <maxim.lanskoy@icloud.com>

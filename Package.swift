@@ -1,10 +1,10 @@
-// swift-tools-version:5.2
+// swift-tools-version: 5.4
 
 import PackageDescription
 
 let package = Package(
     name: "TelegramBotSDK",
-    platforms: [.macOS(.v10_15)],
+    platforms: [.macOS(.v11)],
     products: [
         .library(
             name: "TelegramBotSDK",
@@ -18,6 +18,5 @@ let package = Package(
             name: "TelegramBotSDKTests",
             dependencies: ["TelegramBotSDK"]
         )
-    ],
-    swiftLanguageVersions: [.v5]
+    ]
 )

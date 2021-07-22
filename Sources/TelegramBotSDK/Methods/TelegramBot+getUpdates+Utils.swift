@@ -29,8 +29,8 @@ extension TelegramBot {
                             logger("Error: \(error.debugDescription) Reconnect attempt \(retryCount), will retry at once")
                         } else {
                             logger("Error: \(error.debugDescription) Reconnect attempt \(retryCount), will retry after \(delay) sec")
+                            wait(seconds: delay)
                         }
-                        wait(seconds: delay)
                     }
                     // Unrecoverable error, report to caller
                     return nil
