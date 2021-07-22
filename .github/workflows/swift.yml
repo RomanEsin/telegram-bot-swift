@@ -29,3 +29,5 @@ jobs:
           swift-version: "5.4"
       - name: Build
         run: swift build
+      - name: Test
+        run: swift test
