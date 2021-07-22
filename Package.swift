@@ -20,6 +20,10 @@ let package = Package(
         .target(
             name: "TelegramBotSDK",
             dependencies: ["CCurl"]),
+        .testTarget(
+            name: "TelegramBotSDKTests",
+            dependencies: ["CCurl", "TelegramBotSDK"]
+        )
     ],
     swiftLanguageVersions: [.v5]
 )
