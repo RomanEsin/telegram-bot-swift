@@ -91,6 +91,8 @@ public class TelegramBot {
     /// This function will block until the request is finished.
     public lazy var name: BotName = BotName(username: self.username)
 
+    /// URLSession with cache policy set to
+    /// `.reloadIgnoringLocalAndRemoteCacheData`
     private lazy var urlSession: URLSession = {
         var config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -193,6 +195,7 @@ public class TelegramBot {
             return
         }
 
+        // Use post to send http body
         request.httpMethod = "POST"
         request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         request.httpBody = requestData
