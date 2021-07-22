@@ -10,14 +10,14 @@ import XCTest
 @testable import TelegramBotSDK
 
 class TelegramBotTests: XCTestCase {
-    public var logger: (_ text: Any?) -> () = {
+    var logger: (_ text: Any?) -> () = {
 
         print("[TEST LOGGER]: \($0 ?? "nil")")
     }
 
-    func testGetBot() {
-        let botToken = "1902701325:AAHvOTL-RqJDo8gLtImcaot-Hzu7bh9lo6o"
+    let botToken = "1902701325:AAHvOTL-RqJDo8gLtImcaot-Hzu7bh9lo6o"
 
+    func testGetBot() {
         let bot = TelegramBot(token: botToken, fetchBotInfo: false)
 
         guard let botUser: User = bot.requestSync("getMe") else {
@@ -26,6 +26,12 @@ class TelegramBotTests: XCTestCase {
         }
 
         XCTAssertEqual(botUser.username, "asap_feedback_dev_bot")
+    }
+
+    func testSendMessage() {
+        let bot = TelegramBot(token: botToken)
+        let msg = bot.sendMessageSync(chatId: .chat(440740323), text: "Hello, world!")
+        XCTAssertNotNil(msg)
     }
 }
 
