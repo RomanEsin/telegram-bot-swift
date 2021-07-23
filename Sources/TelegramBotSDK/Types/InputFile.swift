@@ -10,9 +10,9 @@ import Foundation
 /// - SeeAlso: <https://core.telegram.org/bots/api#inputfile>
 
 public class InputFile: Codable {
-    var filename: String
-    var data: Data
-    var mimeType: String?
+    public var filename: String
+    public var data: Data
+    public var mimeType: String?
     
     public init(filename: String, data: Data, mimeType: String? = nil) {
         self.filename = filename
