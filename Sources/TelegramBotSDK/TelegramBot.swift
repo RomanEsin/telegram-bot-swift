@@ -5,10 +5,9 @@
 //
 
 import Foundation
-#if os(Linux)
-import FoundationNetworking
-#endif
 import Dispatch
+
+import CCurl
 
 public class TelegramBot {
     internal typealias DataTaskCompletion = (_ result: Decodable?, _ error: DataTaskError?)->()
@@ -93,15 +92,6 @@ public class TelegramBot {
     ///
     /// This function will block until the request is finished.
     public lazy var name: BotName = BotName(username: self.username)
-
-    /// URLSession with cache policy set to
-    /// `.reloadIgnoringLocalAndRemoteCacheData`
-    private lazy var urlSession: URLSession = {
-        var config = URLSessionConfiguration.default
-        config.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let session = URLSession(configuration: config)
-        return session
-    }()
     
     /// Creates an instance of Telegram Bot.
     /// - Parameter token: A unique authentication token.
@@ -159,8 +149,7 @@ public class TelegramBot {
     /// specific requests.
     internal func startDataTaskForEndpoint<T: Decodable>(_ endpoint: String, parameters: [String: Encodable?], resultType: T.Type, completion: @escaping DataTaskCompletion) {
         let endpointUrl = urlForEndpoint(endpoint)
-        var request = URLRequest(url: endpointUrl)
-
+        
         // If parameters contain values of type InputFile, use  multipart/form-data for sending them.
         var hasAttachments = false
         for valueOrNil in parameters.values {
@@ -184,6 +173,7 @@ public class TelegramBot {
             let boundary = HTTPUtils.generateBoundaryString()
             contentType = "multipart/form-data; boundary=\(boundary)"
             requestDataOrNil = HTTPUtils.createMultipartFormDataBody(with: parameters, boundary: boundary)
+            //try! requestDataOrNil!.write(to: URL(fileURLWithPath: "/tmp/dump.bin"))
             logger("endpoint: \(endpoint), sending parameters as multipart/form-data")
         } else {
             contentType = "application/x-www-form-urlencoded"
@@ -192,63 +182,119 @@ public class TelegramBot {
                 requestDataOrNil = encoded.data(using: .utf8)
             }
         }
+        requestDataOrNil?.append(0)
 
         guard let requestData = requestDataOrNil else {
             completion(nil, .invalidRequest)
             return
         }
-
-        // Use post to send http body
-        request.httpMethod = "POST"
-        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
-        request.httpBody = requestData
-
-        let dataTask = urlSession.dataTask(with: request) { data, response, error in
-            let data = data ?? Data()
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            decoder.dateDecodingStrategy = .secondsSince1970
-
-            guard let response = response as? HTTPURLResponse else {
-                completion(nil, .noDataReceived)
-                return
+        // -1 for '\0'
+        let byteCount = requestData.count - 1
+        
+        DispatchQueue.global().async { [weak self] in
+            requestData.withUnsafeBytes { (unsafeRawBufferPointer) -> Void in
+                let unsafeBufferPointer = unsafeRawBufferPointer.bindMemory(to: UInt8.self).baseAddress!
+                self?.curlPerformRequest(endpointUrl: endpointUrl, contentType: contentType, resultType: resultType, requestBytes: unsafeBufferPointer, byteCount: byteCount, completion: completion)
             }
-            let httpCode = response.statusCode
-
-            var telegramResponse: Response<T>?
-            do {
-                telegramResponse = try decoder.decode(Response<T>.self, from: data)
-            } catch {
-                print(error.localizedDescription)
-                completion(nil, .decodeError(data: data))
-                return
-            }
-            guard let safeTelegramResponse = telegramResponse else {
-                completion(nil, .decodeError(data: data))
-                return
-            }
-            guard httpCode == 200 else {
-                completion(nil,
-                           .invalidStatusCode(
-                            statusCode: httpCode,
-                            telegramDescription: safeTelegramResponse.description!,
-                            telegramErrorCode: safeTelegramResponse.errorCode!,
-                            data: data)
-                )
-                return
-            }
-            guard !data.isEmpty else {
-                completion(nil, .noDataReceived)
-                return
-            }
-            if !safeTelegramResponse.ok {
-                completion(nil, .serverError(data: data))
-                return
-            }
-            completion(safeTelegramResponse.result!, nil)
         }
-
-        dataTask.resume()
+    }
+    
+    /// Note: performed on global queue
+    private func curlPerformRequest<T: Decodable>(endpointUrl: URL, contentType: String, resultType: T.Type, requestBytes: UnsafePointer<UInt8>, byteCount: Int, completion: @escaping DataTaskCompletion) {
+        var callbackData = WriteCallbackData()
+        
+        guard let curl = curl_easy_init() else {
+            completion(nil, .libcurlInitError)
+            return
+        }
+        defer {
+            curl_easy_cleanup(curl)
+        }
+        
+        curl_easy_setopt_string(curl, CURLOPT_URL, endpointUrl.absoluteString)
+        curl_easy_setopt_int(curl, CURLOPT_HTTP_VERSION, Int32(CURL_HTTP_VERSION_1_1))
+        curl_easy_setopt_int(curl, CURLOPT_POST, 1)
+        curl_easy_setopt_binary(curl, CURLOPT_POSTFIELDS, requestBytes)
+        curl_easy_setopt_int(curl, CURLOPT_POSTFIELDSIZE, Int32(byteCount))
+        
+        var headers: UnsafeMutablePointer<curl_slist>? = nil
+        headers = curl_slist_append(headers, "Content-Type: \(contentType)")
+        curl_easy_setopt_slist(curl, CURLOPT_HTTPHEADER, headers)
+        defer { curl_slist_free_all(headers) }
+        
+        let writeFunction: curl_write_callback = { (ptr, size, nmemb, userdata) -> Int in
+            let count = size * nmemb
+            if let writeCallbackDataPointer = userdata?.assumingMemoryBound(to: WriteCallbackData.self) {
+                let writeCallbackData = writeCallbackDataPointer.pointee
+                ptr?.withMemoryRebound(to: UInt8.self, capacity: count) {
+                    writeCallbackData.data.append(&$0.pointee, count: count)
+                }
+            }
+            return count
+        }
+        curl_easy_setopt_write_function(curl, CURLOPT_WRITEFUNCTION, writeFunction)
+        curl_easy_setopt_pointer(curl, CURLOPT_WRITEDATA, &callbackData)
+        //curl_easy_setopt_int(curl, CURLOPT_VERBOSE, 1)
+        let code = curl_easy_perform(curl)
+        guard code == CURLE_OK else {
+            reportCurlError(code: code, completion: completion)
+            return
+        }
+        
+        //let result = String(data: callbackData.data, encoding: .utf8)
+        //print("CURLcode=\(code.rawValue) result=\(result.unwrapOptional)")
+        
+        guard code != CURLE_ABORTED_BY_CALLBACK else {
+            completion(nil, .libcurlAbortedByCallback)
+            return
+        }
+        
+        var httpCode: Int = 0
+        guard CURLE_OK == curl_easy_getinfo_long(curl, CURLINFO_RESPONSE_CODE, &httpCode) else {
+            reportCurlError(code: code, completion: completion)
+            return
+        }
+        let data = callbackData.data
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .secondsSince1970
+        var telegramResponse: Response<T>?
+        do {
+            telegramResponse = try decoder.decode(Response<T>.self, from: data)
+        } catch {
+            print(error.localizedDescription)
+            completion(nil, .decodeError(data: data))
+            return
+        }
+        guard let safeTelegramResponse = telegramResponse else {
+            completion(nil, .decodeError(data: data))
+            return
+        }
+        guard httpCode == 200 else {
+            completion(nil,
+                       .invalidStatusCode(
+                        statusCode: httpCode,
+                        telegramDescription: safeTelegramResponse.description!,
+                        telegramErrorCode: safeTelegramResponse.errorCode!,
+                        data: data)
+            )
+            return
+        }
+        guard !data.isEmpty else {
+            completion(nil, .noDataReceived)
+            return
+        }
+        if !safeTelegramResponse.ok {
+            completion(nil, .serverError(data: data))
+            return
+        }
+        completion(safeTelegramResponse.result!, nil)
+    }
+    
+    private func reportCurlError(code: CURLcode, completion: @escaping DataTaskCompletion) {
+        let failReason = String(cString: curl_easy_strerror(code), encoding: .utf8) ?? "unknown error"
+        //print("Request failed: \(failReason)")
+        completion(nil, .libcurlError(code: code, description: failReason))
     }
     
     private func urlForEndpoint(_ endpoint: String) -> URL {
